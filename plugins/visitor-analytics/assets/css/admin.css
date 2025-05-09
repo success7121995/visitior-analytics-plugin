@@ -1,0 +1,24 @@
+.visitor-analytics-admin-content {
+    margin-top: 20px;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+}
+
+.visitor-analytics-admin-header {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.visitor-analytics-admin-header h2 {
+    margin: 0;
+    padding: 0;
+    font-size: 1.3em;
+    font-weight: 600;
+}
+
+.visitor-analytics-admin-body {
+    line-height: 1.6;
+} 
