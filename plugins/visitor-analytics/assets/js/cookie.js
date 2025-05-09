@@ -93,12 +93,17 @@ const promptCookieBanner = () => {
 
     cookieBanner.classList.add('cookie-banner');
     cookieBanner.innerHTML = `
-        <h1 id="cookie-banner-title">We use cookies to optimize your experience</h1>
-
-        <p id="cookie-banner-description">You can choose which cookies to allow. By clicking "Accept all", you consent to all cookies. By clicking "Manage preferences", you can adjust your choices.</p>
+    
+        <div class="cookie-banner-content-container">
+            <h1 id="cookie-banner-title"">We use cookies to optimize your experience</h1>
+            
+            <p id="cookie-banner-description">You can choose which cookies to allow. By clicking "Accept all", you consent to all cookies. By clicking "Manage preferences", you can adjust your choices.</p>
         
-        <button id="manage-preferences" class="cookie-banner-btn">Manage preferences</button>
-        <button id="accept-cookies" class="cookie-banner-btn">Accept all</button>
+            <button id="manage-preferences" class="cookie-banner-btn">Manage preferences</button>
+            <button id="accept-cookies" class="cookie-banner-btn">Accept all</button>
+        </div>
+
+
     `;
 
     document.body.appendChild(cookieBanner);
@@ -159,6 +164,11 @@ const cookieSettingsPage = () => {
         existingBanner.style.display = 'none';
     }
 
+    // Create and append backdrop
+    const backdrop = document.createElement('div');
+    backdrop.classList.add('cookie-settings-backdrop');
+    document.body.appendChild(backdrop);
+
     const cookieSettingsPage = document.createElement('div');
     cookieSettingsPage.classList.add('cookie-settings-page');
     
@@ -185,16 +195,20 @@ const cookieSettingsPage = () => {
         `;
     }).join('');
 
+    // Template for the cookie settings page
     cookieSettingsPage.innerHTML = `
         <h1>Cookie Settings</h1>
 
         <form id="cookie-settings-form">
-            <fieldset>
-                <legend>Cookie Preferences</legend>
-                <ul>
+            <ul class="cookie-settings-section">
+                <li class="cookie-settings-section-title" id="analytics-section">
+                    <span>Analytics</span>
+                    <button type="button" class="accordion-toggle">+</button>
+                </li>
+                <div class="cookie-settings-content">
                     ${formFields}
-                </ul>
-            </fieldset>
+                </div>
+            </ul>
 
             <!-- Buttons -->
             <div style="margin-top: 20px;">
@@ -213,10 +227,14 @@ const cookieSettingsPage = () => {
     // Initialize form submission handling
     saveCookieSettings();
 
+    // Initialize accordion functionality
+    accordionToggle();
+
     // Add event listener for the back button
     document.getElementById('back-to-banner').addEventListener('click', () => {
-        // Remove the settings page
+        // Remove the settings page and backdrop
         cookieSettingsPage.remove();
+        backdrop.remove();
 
         // Show the banner again
         if (existingBanner) {
@@ -229,8 +247,8 @@ const cookieSettingsPage = () => {
  * Button Event Listeners
  */
 const btnEventListeners = () => {
-    // Get the buttons
-    const btns = document.querySelectorAll('.cookie-banner-btn');
+    // Get the buttons, excluding the accordion toggle button
+    const btns = document.querySelectorAll('.cookie-banner-btn:not(.accordion-toggle)');
 
     // Add event listeners to the buttons
     btns.forEach(btn => {
@@ -254,12 +272,13 @@ const btnEventListeners = () => {
             if (btnId === 'back-to-banner') {
                 promptCookieBanner();
             }
-
+            
+            // If the button id is "save-cookie-settings", save the cookie settings
             if (btnId === 'save-cookie-settings') {
                 saveCookieSettings();
             }
         })
-    })
+    });
 }
 
 /**
@@ -284,6 +303,7 @@ const initializeAnalytics = (preferences) => {
 const acceptAllCookies = () => {
     const banner = document.querySelector('.cookie-banner');
     const settings = document.querySelector('.cookie-settings-page');
+    const backdrop = document.querySelector('.cookie-settings-backdrop');
 
     // Create a preferences object with all cookies enabled
     const allPreferences = {};
@@ -299,9 +319,10 @@ const acceptAllCookies = () => {
     // Initialize analytics and tracking based on preferences
     initializeAnalytics(allPreferences);
     
-    // Remove both banner and settings page if they exist
+    // Remove banner, settings page, and backdrop if they exist
     if (banner) banner.remove();
     if (settings) settings.remove();
+    if (backdrop) backdrop.remove();
 }
 
 /**
@@ -312,6 +333,7 @@ const saveCookieSettings = () => {
     const form = document.getElementById('cookie-settings-form');
     const banner = document.querySelector('.cookie-banner');
     const settings = document.querySelector('.cookie-settings-page');
+    const backdrop = document.querySelector('.cookie-settings-backdrop');
     
     // Add submit event listener to the form
     form.addEventListener('submit', (e) => {
@@ -333,9 +355,10 @@ const saveCookieSettings = () => {
         // Initialize analytics and tracking based on preferences
         initializeAnalytics(data);
 
-        // Remove both banner and settings page if they exist
+        // Remove banner, settings page, and backdrop if they exist
         if (banner) banner.remove();
         if (settings) settings.remove();
+        if (backdrop) backdrop.remove();
     });
 }
 
@@ -357,3 +380,25 @@ const setCookiePreferences = (data) => {
     document.cookie = `wpva-visitor-analytics-cookie-preferences=${encodeURIComponent(JSON.stringify(data))}; path=/; expires=${expiryDate.toUTCString()}; SameSite=Strict`;
 }
 
+/**
+ * Accordion Toggle
+ */
+const accordionToggle = () => {
+    const accordionTitles = document.querySelectorAll('.cookie-settings-section-title');
+    
+    accordionTitles.forEach(title => {
+        title.addEventListener('click', () => {
+            const content = title.nextElementSibling;
+            const toggleButton = title.querySelector('.accordion-toggle');
+            
+            // Toggle the content visibility
+            if (content.style.display === "block") {
+                content.style.display = "none";
+                toggleButton.textContent = '+';
+            } else {
+                content.style.display = "block";
+                toggleButton.textContent = '-';
+            }
+        });
+    });
+} 

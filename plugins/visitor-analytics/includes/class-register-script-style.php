@@ -11,6 +11,7 @@
 class Register_Script_Style {
     public function __construct() {
         add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
+        add_action('wp_enqueue_scripts', [$this, 'enqueue_styles']);
         add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_scripts']);
     }
 
@@ -31,6 +32,13 @@ class Register_Script_Style {
         wp_localize_script('visitor_analytics_get_geolocation', 'visitor_analytics_get_geolocation', [
             'ajaxurl' => admin_url('admin-ajax.php')
         ]);
+    }
+
+    /**
+     * Enqueue styles
+     */
+    public function enqueue_styles() {
+        wp_enqueue_style('visitor_analytics_banner', plugin_dir_url(__FILE__) . '../assets/css/banner.css', [], '1.0');
     }
 
     /**
