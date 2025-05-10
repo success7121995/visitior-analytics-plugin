@@ -14,6 +14,7 @@ if (!defined('ABSPATH')) {
 ## Include required files
 require_once plugin_dir_path(__FILE__) . 'includes/class-analytics-core.php';
 require_once plugin_dir_path(__FILE__) . 'includes/class-database-manager.php';
+require_once plugin_dir_path(__FILE__) . 'includes/class-display-figure.php';
 require_once plugin_dir_path(__FILE__) . 'includes/class-visitor-tracker.php';
 require_once plugin_dir_path(__FILE__) . 'includes/class-register-script-style.php';
 
@@ -23,6 +24,7 @@ function wp_visitor_analytics_init() {
     $register_script_style = new Register_Script_Style();
     $visitor_tracker = new Visitor_Tracker();
     $database_manager = new Database_Manager();
+    $display_figure = new Display_Figure();
 }
 
 add_action('plugins_loaded', 'wp_visitor_analytics_init');

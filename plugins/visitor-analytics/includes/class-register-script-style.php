@@ -54,8 +54,20 @@ class Register_Script_Style {
         wp_register_style('visitor_analytics_admin', plugin_dir_url(__FILE__) . '../assets/css/admin.css', [], '1.0');
         wp_enqueue_style('visitor_analytics_admin');
 
+        // Register and enqueue Chart.js for admin
+        wp_enqueue_script('chart-js', 'https://cdn.jsdelivr.net/npm/chart.js', [], null, true);
+
+        // Register and enqueue chart.js
+        wp_register_script('visitor_analytics_chart', plugin_dir_url(__FILE__) . '../assets/js/chart.js', [], '1.0', true);
+        wp_enqueue_script('visitor_analytics_chart');
+
         // Register and enqueue admin scripts
         wp_register_script('visitor_analytics_admin', plugin_dir_url(__FILE__) . '../assets/js/admin.js', ['jquery'], '1.0', true);
         wp_enqueue_script('visitor_analytics_admin');
+
+        // Localize script for chart
+        wp_localize_script('visitor_analytics_chart', 'visitor_analytics_chart', [
+            'ajaxurl' => admin_url('admin-ajax.php')
+        ]);
     }
 }
