@@ -17,6 +17,7 @@ require_once plugin_dir_path(__FILE__) . 'includes/class-database-manager.php';
 require_once plugin_dir_path(__FILE__) . 'includes/class-display-figure.php';
 require_once plugin_dir_path(__FILE__) . 'includes/class-visitor-tracker.php';
 require_once plugin_dir_path(__FILE__) . 'includes/class-register-script-style.php';
+require_once plugin_dir_path(__FILE__) . 'includes/class-api-endpoints.php';
 
 ## Initialize plugin
 function wp_visitor_analytics_init() {
@@ -25,6 +26,7 @@ function wp_visitor_analytics_init() {
     $visitor_tracker = new Visitor_Tracker();
     $database_manager = new Database_Manager();
     $display_figure = new Display_Figure();
+    $api_endpoints = new API_Endpoints();
 }
 
 add_action('plugins_loaded', 'wp_visitor_analytics_init');

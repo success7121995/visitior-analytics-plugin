@@ -168,7 +168,7 @@ class Database_Manager {
     public function get_total_visitors_by($column) {
         global $wpdb;
 
-        $allowed_columns = ['ip', 'network', 'version', 'country_name', 'browser', 'device', 'city', 'region', 'region_code', 'postal', 'latitude', 'longitude', 'languages', 'timezone', 'utc_offset', 'country_calling_code', 'country_area', 'asn', 'org'];
+        $allowed_columns = ['ip', 'network', 'landing_page', 'version', 'country_name', 'browser', 'device', 'city', 'region', 'region_code', 'postal', 'latitude', 'longitude', 'languages', 'timezone', 'utc_offset', 'country_calling_code', 'country_area', 'asn', 'org'];
 
         if (!in_array($column, $allowed_columns)) {
             throw new InvalidArgumentException("Invalid column name: " . htmlspecialchars($column));

@@ -1,5 +1,5 @@
 /**
- * Chart.js
+ * figure.js
  * 
  * This file contains the JavaScript code for the chart.js library.
  * It includes methods for initializing the chart and for updating the chart.
@@ -14,7 +14,7 @@ class Figure {
      * @param {number} currentYear - Current year to display the chart for
      * @param {number} currentMonth - Current month to display the chart for
      */
-    constructor(chartElement, currentYear, currentMonth = null) {
+    constructor(chartElement = null, currentYear, currentMonth = null) {
         this.chartElement = chartElement;
         this.currentYear = currentYear;
         this.currentMonth = currentMonth;
@@ -30,14 +30,16 @@ class Figure {
             return;
         }
 
-        // Check if month is provided
-        if (!this.currentMonth) {
-            this.renderYearSelect();
-        } else {
-            this.renderYearAndMonthSelect();
+        // Only render chart if chartElement is provided
+        if (this.chartElement) {
+            // Check if month is provided
+            if (!this.currentMonth) {
+                this.renderYearSelect();
+            } else {
+                this.renderYearAndMonthSelect();
+            }
+            this.renderChart();
         }
-
-        this.renderChart();
     }
 
     /**
@@ -48,14 +50,12 @@ class Figure {
 
         // Create year select
         const yearSelect = document.createElement('select');
-        yearSelect.id = 'visitor-analytics-year-select';
 
         // Define the range of years
-        const startYear = 2024;
-        const endYear = this.currentYear + 5;
+        const startYear = 2025;
 
         // Generate options for each year in the range, including startYear
-        for (let year = startYear; year <= endYear; year++) {
+        for (let year = startYear; year <= this.currentYear; year++) {
             yearSelect.innerHTML += year === this.currentYear ?
                 `<option value="${year}" selected>${year}</option>` :
                 `<option value="${year}">${year}</option>`;
@@ -79,14 +79,12 @@ class Figure {
 
         // Create year select
         const yearSelect = document.createElement('select');
-        yearSelect.id = 'visitor-analytics-year-select';
 
         // Define the range of years
-        const startYear = 2024;
-        const endYear = this.currentYear + 5;
+        const startYear = 2025;
 
         // Generate options for each year in the range
-        for (let year = startYear; year <= endYear; year++) {
+        for (let year = startYear; year <= this.currentYear; year++) {
             yearSelect.innerHTML += year === this.currentYear ?
                 `<option value="${year}" selected>${year}</option>` :
                 `<option value="${year}">${year}</option>`;
@@ -102,8 +100,8 @@ class Figure {
 
         // Create month select
         const monthSelect = document.createElement('select');
-        monthSelect.id = 'visitor-analytics-month-select';
-
+        monthSelect.className = 'visitor-analytics-select';
+        
         // Generate options for each month
         for (let month = 1; month <= 12; month++) {
             monthSelect.innerHTML += month === this.currentMonth ?
@@ -124,6 +122,11 @@ class Figure {
      * Render chart
      */
     async renderChart() {
+        // Only render if chartElement exists
+        if (!this.chartElement) {
+            return;
+        }
+
         const res = await this.fetchDataForChart();
 
         if (!res.success || !res.data) {
@@ -143,6 +146,15 @@ class Figure {
         const labels = this.currentMonth ? res.data.map(item => item.day) : res.data.map(item => item.month);
         const data = res.data.map(item => item.total_visitors);
 
+        // Calculate max value for better scaling
+        const maxDataValue = Math.max(...data);
+        const yAxisMax = this.currentMonth ?
+            maxDataValue > 100 ? Math.min(maxDataValue + 10, 200) : 100 :
+            maxDataValue > 500 ? Math.min(maxDataValue + 50, 1000) : 500;
+
+        // Register the datalabels plugin globally
+        Chart.register(ChartDataLabels);
+
         // Create new chart and store the instance
         this.chart = new Chart(ctx, {
             type: 'bar',
@@ -158,21 +170,9 @@ class Figure {
             },
             options: {
                 responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: Math.max(...data) + 100,
-                        title: {
-                            display: true,
-                            text: 'Number of Visitors'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: this.currentMonth ? 'Day' : 'Month'
-                        }
-                    }
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 500 // Reduce animation duration for better performance
                 },
                 plugins: {
                     title: {
@@ -180,9 +180,50 @@ class Figure {
                         text: this.currentMonth ? 
                             `Visitor Analytics for ${this.monthNames[this.currentMonth - 1]} ${this.currentYear}` :
                             `Visitor Analytics for ${this.currentYear}`
+                    },
+                    datalabels: {
+                        display: true,
+                        color: '#000',
+                        anchor: 'end',
+                        align: 'top',
+                        offset: 4,
+                        formatter: function(value) {
+                            return value > 0 ? value : '';
+                        },
+                        font: {
+                            weight: 'bold',
+                            size: 11 // Slightly smaller font for better fit
+                        },
+                        padding: {
+                            top: 2
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: yAxisMax,
+                        title: {
+                            display: true,
+                            text: 'Number of Visitors'
+                        },
+                        ticks: {
+                            maxTicksLimit: 6 // Limit the number of ticks for better performance
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: this.currentMonth ? 'Day' : 'Month'
+                        },
+                        ticks: {
+                            maxRotation: 45, // Rotate labels for better fit
+                            minRotation: 45
+                        }
                     }
                 }
-            }
+            },
+            plugins: [ChartDataLabels]
         });
     }
 

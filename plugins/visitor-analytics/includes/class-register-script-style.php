@@ -54,11 +54,17 @@ class Register_Script_Style {
         wp_register_style('visitor_analytics_admin', plugin_dir_url(__FILE__) . '../assets/css/admin.css', [], '1.0');
         wp_enqueue_style('visitor_analytics_admin');
 
-        // Register and enqueue Chart.js for admin
-        wp_enqueue_script('chart-js', 'https://cdn.jsdelivr.net/npm/chart.js', [], null, true);
+
+        // Register and enqueue export-data.js
+        wp_register_script('visitor_analytics_export-data', plugin_dir_url(__FILE__) . '../assets/js/export-data.js', [], '1.0', true);
+        wp_enqueue_script('visitor_analytics_export-data');
+
+        // Register and enqueue Chart.js and its plugins in correct order
+        wp_enqueue_script('chart-js', 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js', [], '4.4.1', true);
+        wp_enqueue_script('chartjs-datalabels', 'https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0', ['chart-js'], '2.2.0', true);
 
         // Register and enqueue chart.js
-        wp_register_script('visitor_analytics_chart', plugin_dir_url(__FILE__) . '../assets/js/chart.js', [], '1.0', true);
+        wp_register_script('visitor_analytics_chart', plugin_dir_url(__FILE__) . '../assets/js/chart.js', ['chart-js', 'chartjs-datalabels'], '1.0', true);
         wp_enqueue_script('visitor_analytics_chart');
 
         // Register and enqueue admin scripts

@@ -33,41 +33,32 @@ $display_figure = new Display_Figure();
             <h2>Visitor Analytics Dashboard</h2>
         </div>
         
+        <!-- Total Visitors -->
         <div class="visitor-analytics-admin-body">
-            <div class="visitor-analytics-admin-section">
-                <!-- Total Visitors -->
-                <?php echo $display_figure -> display_total_visitors(); ?>
-            </div>
+            <?php echo $display_figure -> display_total_visitors(); ?>
+        </div>
 
-            <div class="visitor-analytics-admin-section">
+        <!-- Charts -->
+        <div class="visitor-analytics-admin-body">
+
+            <div class="visitor-analytics-chart-section">
+
                 <!-- Total Visitors by Month -->
                 <?php echo $display_figure -> display_total_visitors_by_month(); ?>
-            </div>
 
-            <div class="visitor-analytics-admin-section">
                 <!-- Total Visitors by Day -->
                 <?php echo $display_figure -> display_total_visitors_by_day(); ?>
-            </div>
 
-            <div class="visitor-analytics-admin-section">
-                <!-- Unique Visitors -->
-                <?php echo $display_figure ->  display_total_visitors_by('ip', 'IP Address', 'IP Address') ?>
             </div>
+        </div>
 
-            <div class="visitor-analytics-admin-section">
-                <!-- Total Visitors by Country -->
-                <?php echo $display_figure ->  display_total_visitors_by('country_name', 'Country', 'Country') ?>
-            </div>
-
-            <div class="visitor-analytics-admin-section">
-                <!-- Total Visitors by Browser -->
-                <?php echo $display_figure ->  display_total_visitors_by('device', 'Device', 'Device') ?>
-            </div>
-
-            <div class="visitor-analytics-admin-section">
-                <!-- Total Visitors by Device -->
-                <?php echo $display_figure ->  display_total_visitors_by('browser', 'Browser', 'Browser') ?>
-            </div>
+        <div class="visitor-analytics-admin-body visitor-analytics-total-visitors-by">
+            <?php echo $display_figure -> display_total_visitors_by('ip', 'Total Visitors by IP', 'IP'); ?>
+            <?php echo $display_figure -> display_total_visitors_by('country_name', 'Total Visitors by Country', 'Country'); ?>
+            <?php echo $display_figure -> display_total_visitors_by('landing_page', 'Landing Page', 'Landing Page'); ?>
+            <?php echo $display_figure -> display_total_visitors_by('browser', 'Browser', 'Browser'); ?>
+            <?php echo $display_figure -> display_total_visitors_by('device', 'Device', 'Device'); ?>
+            <?php echo $display_figure -> display_total_visitors_by('city', 'City', 'City'); ?>
         </div>
     </div>
 

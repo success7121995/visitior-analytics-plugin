@@ -39,15 +39,15 @@ class Analytics_Core {
                 [$this, 'render_dashboard_page'] // Callback function
             );
 
-            // Add settings submenu
-            add_submenu_page(
-                'visitor-analytics', // Parent slug
-                'Settings', // Page title
-                'Settings', // Submenu title
-                'manage_options', // Capability
-                'visitor-analytics-settings', // Menu slug
-                [$this, 'render_settings_page'] // Callback function
-            );
+            // // Add settings submenu
+            // add_submenu_page(
+            //     'visitor-analytics', // Parent slug
+            //     'Settings', // Page title
+            //     'Settings', // Submenu title
+            //     'manage_options', // Capability
+            //     'visitor-analytics-settings', // Menu slug
+            //     [$this, 'render_settings_page'] // Callback function
+            // );
         } catch (Exception $e) {
             error_log('Error adding admin menu: ' . $e -> getMessage());
         }
