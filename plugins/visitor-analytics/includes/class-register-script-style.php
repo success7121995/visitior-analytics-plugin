@@ -11,7 +11,6 @@
 class Register_Script_Style {
     public function __construct() {
         add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
-        add_action('wp_enqueue_scripts', [$this, 'enqueue_styles']);
         add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_scripts']);
     }
 
@@ -19,12 +18,6 @@ class Register_Script_Style {
      * Enqueue scripts
      */
     public function enqueue_scripts() {
-        ## Enqueue manage preference script
-        wp_enqueue_script('visitor_analytics_manage-preference', plugin_dir_url(__FILE__) . '../assets/js/manage-preference.js', [], '1.0', true);
-
-        ## Enqueue cookie script
-        wp_enqueue_script('visitor_analytics_cookie', plugin_dir_url(__FILE__) . '../assets/js/cookie.js', [], '1.0', true);
-
         ## Enqueue ajax script
         wp_enqueue_script('visitor_analytics_get_geolocation', plugin_dir_url(__FILE__) . '../assets/js/get-geolocation.js', [], '1.0', true);
         
@@ -32,13 +25,6 @@ class Register_Script_Style {
         wp_localize_script('visitor_analytics_get_geolocation', 'visitor_analytics_get_geolocation', [
             'ajaxurl' => admin_url('admin-ajax.php')
         ]);
-    }
-
-    /**
-     * Enqueue styles
-     */
-    public function enqueue_styles() {
-        wp_enqueue_style('visitor_analytics_banner', plugin_dir_url(__FILE__) . '../assets/css/banner.css', [], '1.0');
     }
 
     /**

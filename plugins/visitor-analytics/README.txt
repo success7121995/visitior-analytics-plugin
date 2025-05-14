@@ -1,8 +1,8 @@
-=== WP Visitor Analytics ===
+=== Visitor Tracker: Analytics for WP ===
 Contributors: stanfordtse
 Tags: analytics, visitors, tracking, statistics, dashboard, charts, graphs
 Requires at least: 5.0
-Tested up to: 6.4
+Tested up to: 6.8
 Stable tag: 1.0.0
 Requires PHP: 7.4
 License: GPLv2 or later
@@ -12,7 +12,7 @@ Track and visualize your website visitors with detailed analytics and beautiful 
 
 == Description ==
 
-WP Visitor Analytics is a powerful WordPress plugin that helps you track and analyze your website visitors. It provides detailed insights about your visitors' behavior, including their location, browser, device, and more.
+Visitor Tracker: Analytics for WP is a powerful WordPress plugin that helps you track and analyze your website visitors. It provides detailed insights about your visitors' behavior, including their location, browser, device, and more.
 
 = Key Features =
 

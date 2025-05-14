@@ -6,57 +6,7 @@
 
 class GetGeoLocation {
     constructor() {
-        this.preferences = this.getCookiePreferences();
-
-        // If no preferences, return
-        if (!this.preferences) {
-            return;
-        }
-
-        this.visitorId = this.getVisitorId();
-        
-        if (this.visitorId) {
-            this.sendGeoLocationDataToServer();
-        }
-    }
-
-    /**
-     * Get the cookie preferences
-     * @returns {Object} The cookie preferences
-     */
-    getCookiePreferences = () => {
-        const cookieName = 'wpva-visitor-analytics-cookie-preferences';
-        const cookies = document.cookie.split(';');
-        
-        for (let cookie of cookies) {
-            const [name, value] = cookie.trim().split('=');
-            if (name === cookieName) {
-                try {
-                    return JSON.parse(decodeURIComponent(value));
-                } catch (e) {
-                    console.error('Error parsing cookie preferences:', e);
-                    return null;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Get Visitor ID from cookie
-     * @returns {string|null} Visitor ID
-     */
-    getVisitorId() {
-        const cookies = document.cookie.split(';');
-        
-        for (let cookie of cookies) {
-            const [name, value] = cookie.trim().split('=');
-            if (name === 'visitor_id') {
-                return value;
-            }
-        }
-        
-        return null;
+        this.sendGeoLocationDataToServer();
     }
 
     /**
@@ -64,75 +14,64 @@ class GetGeoLocation {
      */
     async sendGeoLocationDataToServer() {
         try {
-            
-            
-            // Get IP Address
-            const ipAddress = this.preferences.ip_address === "on" ? await this.getIpAddress() : null;
+            // Get user agent, landing page, referrer, visit time
+            const user_agent = navigator.userAgent;
+            const landing_page = window.location.href;
+            const referrer = document.referrer || null;
+            const visit_time = new Date().toISOString();
+            const device = this.getDevice(user_agent);
+            const browser = this.getBrowser(user_agent);
 
-            if (!ipAddress) {
-                console.error('Error:', 'No IP Address Found');
-                return;
-            }
+            // Get IP
+            const ipRes = await fetch('https://api.ipify.org?format=json');
+            if (!ipRes.ok) return;
+            const { ip } = await ipRes.json();
+            if (!ip) return;
 
-            // Get Geo Location 
-            const geoLocation = await this.getGeoLocation(ipAddress);
+            // Get geo
+            const geoRes = await fetch(`https://ipapi.co/${ip}/json/`);
+            if (!geoRes.ok) return;
+            const geo = await geoRes.json();
+            if (!geo || geo.error) return;
 
-            if (!geoLocation) {
-                console.error('Error:', 'No Geo Location Found');
-                return;
-            }
+            // Prepare data
+            const data = {
+                landing_page,
+                user_agent,
+                device,
+                browser,
+                visit_time,
+                referrer,
+                ip,
+                network: geo.network || null,
+                version: geo.version || null,
+                city: geo.city || null,
+                region: geo.region || null,
+                region_code: geo.region_code || null,
+                country_name: geo.country_name || null,
+                country_code: geo.country_code || null,
+                postal: geo.postal || null,
+                latitude: geo.latitude || null,
+                longitude: geo.longitude || null,
+                languages: geo.languages || null,
+                timezone: geo.timezone || null,
+                utc_offset: geo.utc_offset || null,
+                country_calling_code: geo.country_calling_code || null,
+                country_area: geo.country_area || null,
+                asn: geo.asn || null,
+                org: geo.org || null
+            };
 
-            // Get Geo Location Data
-            const data = {};
-            const keys = [
-                'ip_address',
-                'network',
-                'version',
-                'city',
-                'region',
-                'region_code',
-                'country_name',
-                'country_code',
-                'postal',
-                'latitude',
-                'longitude',
-                'languages',
-                'timezone',
-                'utc_offset',
-                'country_calling_code',
-                'country_area', 'asn', 'org'
-            ];
-
-            // Check if the preference is on and add the data to the data object
-            for (const key of keys) {
-                const geoKey = key === 'ip_address' ? 'ip' : key; // Map 'ip_address' to 'ip'
-                data[geoKey] = this.preferences[key] === "on" ? geoLocation[geoKey] : null;
-            }
-            
+            // Send to server
             const formData = new FormData();
             formData.append('action', 'get_geo_location_data');
             formData.append('data', JSON.stringify(data));
-            formData.append('visitor_id', this.visitorId);
-
-            // Send Geo Location Data to Server
-            const res = await fetch(visitor_analytics_get_geolocation.ajaxurl, {
+            await fetch(visitor_analytics_get_geolocation.ajaxurl, {
                 method: 'POST',
-                body: formData,
+                body: formData
             });
-
-            if (!res.ok) {
-                console.error('Error:', `HTTP Error! status: ${res.status}`);
-                return;
-            }
-
-            const response = await res.json();
-
-            if (!response.success) {
-                console.error('Error:', response.data);
-            }
-            
-        } catch (err) {
-            console.error('Error:', err.message);
+        } catch (e) {
+            // fail silently
         }
     }
 
@@ -143,12 +82,10 @@ class GetGeoLocation {
     async getIpAddress() {
         try {
             const res = await fetch('https://api.ipify.org?format=json');
-
             if (!res.ok) {
                 console.error('Error:', res.statusText);
                 return;
             }
-
             const { ip } = await res.json();
             return ip;
         } catch (err) {
@@ -164,12 +101,10 @@ class GetGeoLocation {
     async getGeoLocation(ip) {
         try {
             const res = await fetch(`https://ipapi.co/${ip}/json/`);
-
             if (!res.ok) {
                 console.error('Error:', res.statusText);
                 return;
             }
-
             const geoData = await res.json();
 
             return geoData;
@@ -177,4 +112,34 @@ class GetGeoLocation {
             console.error('Error:', err.message);
         }
     }
+
+    getDevice(userAgent) {
+        if (/android|bb\d+|meego.+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(userAgent)) {
+            return 'Mobile';
+        } else if (/ipad|tablet|playbook|silk/i.test(userAgent)) {
+            return 'Tablet';
+        } else {
+            return 'Desktop';
+        }
+    }
+
+    getBrowser(userAgent) {
+        if (/MSIE/i.test(userAgent)) {
+            return 'Internet Explorer';
+        } else if (/Firefox/i.test(userAgent)) {
+            return 'Firefox';
+        } else if (/Chrome/i.test(userAgent)) {
+            return 'Chrome';
+        } else if (/Safari/i.test(userAgent)) {
+            return 'Safari';
+        } else if (/Opera/i.test(userAgent)) {
+            return 'Opera';
+        } else if (/Edge/i.test(userAgent)) {
+            return 'Edge';
+        }
+        return '';
+    }
 }
+
+// 自動 tracking geolocation
+new GetGeoLocation();

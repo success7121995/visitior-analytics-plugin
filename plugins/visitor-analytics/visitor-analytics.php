@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name: WP Visitor Analytics
- * Plugin URI: https://wordpress.org/plugins/wp-visitor-analytics/
+ * Plugin Name: Visitor Tracker: Analytics for WP
+ * Plugin URI: https://wordpress.org/plugins/visitor-tracker-analytics-for-wp/
  * Description: Track and visualize your website visitors with detailed analytics and beautiful charts.
  * Version: 1.0.0
  * Requires at least: 5.0
@@ -10,7 +10,7 @@
  * Author URI: https://profiles.wordpress.org/stanfordtse/
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: wp-visitor-analytics
+ * Text Domain: visitor-tracker-analytics-for-wp
  * Domain Path: /languages
  *
  * @package WP_Visitor_Analytics
@@ -39,7 +39,7 @@ require_once WP_VISITOR_ANALYTICS_PLUGIN_DIR . 'includes/class-api-endpoints.php
  */
 function wp_visitor_analytics_init() {
     // Load plugin text domain
-    load_plugin_textdomain('wp-visitor-analytics', false, dirname(plugin_basename(__FILE__)) . '/languages');
+    load_plugin_textdomain('visitor-tracker-analytics-for-wp', false, dirname(plugin_basename(__FILE__)) . '/languages');
 
     // Initialize plugin components
     new Analytics_Core();
@@ -55,10 +55,6 @@ add_action('plugins_loaded', 'wp_visitor_analytics_init');
  * Activation hook
  */
 function wp_visitor_analytics_activate() {
-    // Create necessary database tables
-    $database_manager = new Database_Manager();
-    $database_manager->create_tables();
-
     // Set default options
     add_option('wp_visitor_analytics_version', WP_VISITOR_ANALYTICS_VERSION);
 }
@@ -78,8 +74,6 @@ register_deactivation_hook(__FILE__, 'wp_visitor_analytics_deactivate');
 function wp_visitor_analytics_uninstall() {
     // Remove plugin data if uninstall is requested
     if (get_option('wp_visitor_analytics_delete_data_on_uninstall')) {
-        $database_manager = new Database_Manager();
-        $database_manager->drop_tables();
         delete_option('wp_visitor_analytics_version');
         delete_option('wp_visitor_analytics_delete_data_on_uninstall');
     }
