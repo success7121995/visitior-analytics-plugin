@@ -57,90 +57,100 @@ jQuery(document).ready(function($) {
      * Initialize table actions (sort, export, modal)
      */
     const initTableAction = () => {
-        // Export button click for table
-        $('.visitor-analytics-button.export.export-table').on('click', function() {
-            const tableId = $(this).closest('.visitor-analytics-table-container').attr('id').replace('visitor-analytics-total-visitors-by-', '');
-            const exportType = $(this).data('format') || 'csv';
-
-            const table = $(`#${tableId}`);
-            const title = table.closest('.visitor-analytics-table-header').find('h2').text();
-
-            // Get all data including modal data
-            const modalId = `visitor-analytics-modal-${tableId}`;
-            const fullTable = $(`#${modalId}`);
-            const rows = fullTable.find('tr').toArray(); // Get all rows from the modal
-
-            // Convert to CSV/JSON
-            let dataArray = [];
-
-            rows.forEach(row => {
-                const rowData = [];
-                $(row).find('th, td').each(function() {
-                    rowData.push($(this).text().trim());
-                });
-                dataArray.push(rowData);
-            });
-
-            // Export data with table name
-            new ExportData(dataArray, exportType, 'table', tableId);
+        // Simple click toggle for export dropdown
+        $('.visitor-analytics-button.export').on('click', function() {
+            const $options = $(this).siblings('.visitor-analytics-export-options');
+            $options.toggleClass('show');
         });
 
-        // Export button click for year and month chart
-        $('.visitor-analytics-button.export.export-chart').on('click', async function() {
+        // Export button click for table
+        $('.visitor-analytics-export-option').on('click', function() {
             const $btn = $(this);
-            const exportType = $(this).data('format') || 'csv';
+            const exportType = $btn.data('format');
+            const $container = $btn.closest('.visitor-analytics-export-dropdown');
+            const $exportBtn = $container.find('.export');
+            
+            // Hide the dropdown after selection
+            $container.find('.visitor-analytics-export-options').removeClass('show');
+            
+            if ($exportBtn.hasClass('export-table')) {
+                const tableId = $container.closest('.visitor-analytics-table-container').attr('id').replace('visitor-analytics-total-visitors-by-', '');
+                const table = $(`#${tableId}`);
+                const title = table.closest('.visitor-analytics-table-header').find('h2').text();
 
-            // Handle year chart data export
-            if ($(this).hasClass('year-data-export')) {
-                const currentYear = new Date().getFullYear();
-                const figure = new Figure(null, currentYear);
+                // Get all data including modal data
+                const modalId = `visitor-analytics-modal-${tableId}`;
+                const fullTable = $(`#${modalId}`);
+                const rows = fullTable.find('tr').toArray();
+
+                // Convert to CSV/JSON
+                let dataArray = [];
+
+                rows.forEach(row => {
+                    const rowData = [];
+                    $(row).find('th, td').each(function() {
+                        rowData.push($(this).text().trim());
+                    });
+                    dataArray.push(rowData);
+                });
+
+                // Export data with table name
+                new ExportData(dataArray, exportType, 'table', tableId);
+            } else if ($exportBtn.hasClass('export-chart')) {
+                const $btn = $exportBtn;
                 
-                try {
-                    $btn.prop('disabled', true).text('Exporting...');
-                    const yearData = await figure.fetchDataForChart();
+                // Handle year chart data export
+                if ($exportBtn.hasClass('year-data-export')) {
+                    const currentYear = new Date().getFullYear();
+                    const figure = new Figure(null, currentYear);
                     
-                    // Convert data to CSV/JSON
-                    const dataArray = [];
+                    try {
+                        $btn.prop('disabled', true).text('Exporting...');
+                        figure.fetchDataForChart().then(yearData => {
+                            // Convert data to CSV/JSON
+                            const dataArray = [];
 
-                    if (yearData.success && yearData.data) {
-                        yearData.data.forEach(item => {
-                            dataArray.push([item.year, item.month, item.total_visitors]);
+                            if (yearData.success && yearData.data) {
+                                yearData.data.forEach(item => {
+                                    dataArray.push([item.year, item.month, item.total_visitors]);
+                                });
+                            }
+
+                            // Export data
+                            new ExportData(dataArray, exportType, 'month');
                         });
+                    } catch (err) {
+                        throw Error(err);
+                    } finally {
+                        $btn.prop('disabled', false).text('Export');
                     }
-
-                    // Export data
-                    new ExportData(dataArray, exportType, 'month');
-                } catch (err) {
-                    throw Error(err);
-                } finally {
-                    $btn.prop('disabled', false).text('Export');
                 }
-            }
-            // Handle day chart data export
-            else if ($(this).hasClass('month-data-export')) {
-                const currentYear = new Date().getFullYear();
-                const currentMonth = new Date().getMonth() + 1;
-                const figure = new Figure(null, currentYear, currentMonth);
-                
-                try {
-                    $btn.prop('disabled', true).text('Exporting...');
-                    const dayData = await figure.fetchDataForChart();
+                // Handle day chart data export
+                else if ($exportBtn.hasClass('month-data-export')) {
+                    const currentYear = new Date().getFullYear();
+                    const currentMonth = new Date().getMonth() + 1;
+                    const figure = new Figure(null, currentYear, currentMonth);
                     
-                    // Convert data to CSV/JSON
-                    const dataArray = [];
+                    try {
+                        $btn.prop('disabled', true).text('Exporting...');
+                        figure.fetchDataForChart().then(dayData => {
+                            // Convert data to CSV/JSON
+                            const dataArray = [];
 
-                    if (dayData.success && dayData.data) {
-                        dayData.data.forEach(item => {
-                            dataArray.push([item.year, item.month, item.day, item.total_visitors]);
+                            if (dayData.success && dayData.data) {
+                                dayData.data.forEach(item => {
+                                    dataArray.push([item.year, item.month, item.day, item.total_visitors]);
+                                });
+                            }
+
+                            // Export data
+                            new ExportData(dataArray, exportType, 'day');
                         });
+                    } catch (err) {
+                        throw Error(err);
+                    } finally {
+                        $btn.prop('disabled', false).text('Export');
                     }
-
-                    // Export data
-                    new ExportData(dataArray, exportType, 'day');
-                } catch (err) {
-                    throw Error(err);
-                } finally {
-                    $btn.prop('disabled', false).text('Export');
                 }
             }
         });

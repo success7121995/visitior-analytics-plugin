@@ -42,12 +42,12 @@ function wp_visitor_analytics_init() {
     load_plugin_textdomain('wp-visitor-analytics', false, dirname(plugin_basename(__FILE__)) . '/languages');
 
     // Initialize plugin components
-    $analytics_core = new Analytics_Core();
-    $register_script_style = new Register_Script_Style();
-    $visitor_tracker = new Visitor_Tracker();
-    $database_manager = new Database_Manager();
-    $display_figure = new Display_Figure();
-    $api_endpoints = new API_Endpoints();
+    new Analytics_Core();
+    new Register_Script_Style();
+    new Visitor_Tracker();
+    new Database_Manager();
+    new Display_Figure();
+    new API_Endpoints();
 }
 add_action('plugins_loaded', 'wp_visitor_analytics_init');
 

@@ -44,7 +44,13 @@ class Display_Figure {
                     <div class="visitor-analytics-total-visitors-by-year-select"></div>
                 </div>
 
-                <button class="visitor-analytics-button export export-chart year-data-export">Export</button>
+                <div class="visitor-analytics-export-dropdown">
+                    <button class="visitor-analytics-button export export-chart year-data-export">Export</button>
+                    <div class="visitor-analytics-export-options">
+                        <button class="visitor-analytics-export-option" data-format="csv">CSV</button>
+                        <button class="visitor-analytics-export-option" data-format="json">JSON</button>
+                    </div>
+                </div>
             </div>
 
 
@@ -72,7 +78,13 @@ class Display_Figure {
                     <div class="visitor-analytics-total-visitors-by-month-select"></div>
                 </div>
 
-                <button class="visitor-analytics-button export export-chart month-data-export">Export</button>
+                <div class="visitor-analytics-export-dropdown">
+                    <button class="visitor-analytics-button export export-chart month-data-export">Export</button>
+                    <div class="visitor-analytics-export-options">
+                        <button class="visitor-analytics-export-option" data-format="csv">CSV</button>
+                        <button class="visitor-analytics-export-option" data-format="json">JSON</button>
+                    </div>
+                </div>
             </div>
             
             <canvas id="visitor-analytics-total-visitors-by-day-chart" class="visitor-analytics-total-visitors-chart"></canvas>
@@ -106,9 +118,15 @@ class Display_Figure {
                 <div class="visitor-analytics-table-actions">
 
                     <!-- Export -->
-                    <button class="visitor-analytics-button export export-table">
-                        <span>Export</span>
-                    </button>
+                    <div class="visitor-analytics-export-dropdown">
+                        <button class="visitor-analytics-button export export-table">
+                            <span>Export</span>
+                        </button>
+                        <div class="visitor-analytics-export-options">
+                            <button class="visitor-analytics-export-option" data-format="csv">CSV</button>
+                            <button class="visitor-analytics-export-option" data-format="json">JSON</button>
+                        </div>
+                    </div>
 
                     <!-- Modal Trigger -->
                     <button class="visitor-analytics-button modal-trigger">
